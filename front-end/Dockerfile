@@ -1,13 +1,21 @@
-# Multi-stage build for Front-End React + Vite
+
+# Build stage
 FROM node:20-alpine AS builder
+
 WORKDIR /app
-COPY package*.json ./
+
+COPY front-end/package*.json ./
 RUN npm ci
-COPY . .
+
+COPY front-end/ .
 RUN npm run build
 
+# Production stage
 FROM nginx:alpine
+
 COPY --from=builder /app/dist /usr/share/nginx/html
-COPY nginx.conf /etc/nginx/conf.d/default.conf
+COPY front-end/nginx.conf /etc/nginx/conf.d/default.conf
+
 EXPOSE 80
+
 CMD ["nginx", "-g", "daemon off;"]
