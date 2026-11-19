@@ -1,0 +1,47 @@
+# VINIX7: menjalankan Back-End + Front-End secara lokal dengan Docker.
+# Database memakai Supabase (cloud), bukan Postgres lokal.
+#
+# Persiapan:
+#   1. Salin back-end/.env.example menjadi back-end/.env, lalu isi nilainya
+#      (SUPABASE_URL, SUPABASE_SERVICE_ROLE_KEY, JWT_SECRET, JWT_EXPIRES_IN).
+#   2. File .env TIDAK boleh di-commit ke GitHub.
+# Jalankan dari folder devops/:
+#   docker compose up --build -d
+
+services:
+  # Back-End REST API
+  backend:
+    build:
+      context: ../back-end
+      dockerfile: ../devops/Dockerfile.backend
+    container_name: vinix7_backend
+    restart: always
+    env_file:
+      - ../back-end/.env
+    environment:
+      PORT: 5000
+      NODE_ENV: production
+      DATA_STORE: supabase   # wajib: tanpa ini backend memakai data memori, bukan Supabase
+      FRONTEND_URL: http://localhost:5173
+    ports:
+      - "5000:5000"
+    networks:
+      - vinix_net
+
+  # Front-End Web (Nginx)
+  frontend:
+    build:
+      context: ../front-end
+      dockerfile: ../devops/Dockerfile.frontend
+    container_name: vinix7_frontend
+    restart: always
+    ports:
+      - "5173:80"
+    depends_on:
+      - backend
+    networks:
+      - vinix_net
+
+networks:
+  vinix_net:
+    driver: bridge
