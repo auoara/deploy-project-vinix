@@ -94,20 +94,22 @@ export async function registerUser(nama, email, password) {
   };
 }
 
-export async function loginUser(email, password) {
-  const cleanEmail = email.toLowerCase().trim();
+export async function loginUser(identifier, password) {
+  const cleanId = (identifier || '').toLowerCase().trim();
 
   if (isSupabase()) {
     const supabase = getSupabaseClient();
-    const { data: user, error } = await supabase
-      .from('users')
-      .select('id, nama, email, password_hash, avatar_url')
-      .eq('email', cleanEmail)
-      .maybeSingle();
+    let query = supabase.from('users').select('id, nama, email, password_hash, avatar_url');
+    if (cleanId.includes('@')) {
+      query = query.eq('email', cleanId);
+    } else {
+      query = query.ilike('nama', cleanId);
+    }
+    const { data: user, error } = await query.maybeSingle();
 
     if (error) throw error;
     if (!user) {
-      const err = new Error('Email atau password salah.');
+      const err = new Error('Email atau nama pengguna salah.');
       err.status = 401;
       throw err;
     }
@@ -127,9 +129,13 @@ export async function loginUser(email, password) {
   }
 
   // Mode In-Memory
-  const user = users.find(u => u.email === cleanEmail);
+  const user = users.find(u => 
+    u.email.toLowerCase() === cleanId || 
+    u.nama.toLowerCase() === cleanId ||
+    u.nama.toLowerCase().includes(cleanId)
+  );
   if (!user) {
-    const err = new Error('Email atau password salah.');
+    const err = new Error('Email atau nama pengguna salah.');
     err.status = 401;
     throw err;
   }

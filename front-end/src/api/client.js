@@ -58,9 +58,6 @@ async function ensureAuthToken() {
       const data = await res.json();
       if (data.token) {
         localStorage.setItem('vinix7_token', data.token);
-        if (data.user) {
-          localStorage.setItem('vinix7_user', JSON.stringify(data.user));
-        }
         return data.token;
       }
       return null;
@@ -120,12 +117,12 @@ function normalize(str) {
 
 export const apiClient = {
   // 1. Auth: Login
-  async login(email, password) {
+  async login(emailOrNama, password) {
     if (USE_REAL_BACKEND) {
       const res = await fetch(`${API_BASE_URL}/auth/login`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ email, password })
+        body: JSON.stringify({ email: emailOrNama, identifier: emailOrNama, password })
       });
       const data = await handleResponse(res);
       if (data.token) localStorage.setItem('vinix7_token', data.token);
@@ -133,14 +130,29 @@ export const apiClient = {
       return data;
     }
 
-    await new Promise(r => setTimeout(r, 400));
-    const user = {
-      id: 'u-123456',
-      nama: email.split('@')[0].toUpperCase() || 'Peserta Magang VINIX7',
-      email: email || 'peserta@vinix7.com',
+    await new Promise(r => setTimeout(r, 300));
+    const registeredUsers = JSON.parse(localStorage.getItem('vinix7_registered_users') || '[]');
+    const clean = (emailOrNama || '').toLowerCase().trim();
+    const matched = registeredUsers.find(u => 
+      (u.email && u.email.toLowerCase() === clean) || 
+      (u.nama && u.nama.toLowerCase() === clean) ||
+      (u.nama && u.nama.toLowerCase().includes(clean))
+    );
+
+    const user = matched ? {
+      id: matched.id,
+      nama: matched.nama,
+      email: matched.email,
+      avatar: matched.avatar || 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=150&auto=format&fit=crop&q=80'
+    } : {
+      id: 'u-' + Date.now(),
+      nama: emailOrNama.includes('@') ? emailOrNama.split('@')[0] : emailOrNama,
+      email: emailOrNama.includes('@') ? emailOrNama : `${emailOrNama.toLowerCase().replace(/\s+/g, '')}@vinix7.com`,
       avatar: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=150&auto=format&fit=crop&q=80'
     };
+
     localStorage.setItem('vinix7_user', JSON.stringify(user));
+    localStorage.setItem('vinix7_token', 'mock-jwt-token-vinix7');
     return { success: true, user, token: 'mock-jwt-token-vinix7' };
   },
 
@@ -153,20 +165,25 @@ export const apiClient = {
         body: JSON.stringify({ nama, email, password })
       });
       const data = await handleResponse(res);
-      if (data.token) localStorage.setItem('vinix7_token', data.token);
-      if (data.user) localStorage.setItem('vinix7_user', JSON.stringify(data.user));
+      // Simpan ke local mock storage sebagai cadangan
+      const registeredUsers = JSON.parse(localStorage.getItem('vinix7_registered_users') || '[]');
+      registeredUsers.push({ id: data.user?.id || 'u-' + Date.now(), nama, email, password });
+      localStorage.setItem('vinix7_registered_users', JSON.stringify(registeredUsers));
       return data;
     }
 
     await new Promise(r => setTimeout(r, 400));
-    const user = {
+    const newUser = {
       id: 'u-' + Date.now(),
-      nama: nama || 'Peserta Magang',
-      email,
+      nama: (nama || 'Peserta Magang').trim(),
+      email: email.trim(),
+      password,
       avatar: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=150&auto=format&fit=crop&q=80'
     };
-    localStorage.setItem('vinix7_user', JSON.stringify(user));
-    return { success: true, user, token: 'mock-jwt-token-vinix7' };
+    const registeredUsers = JSON.parse(localStorage.getItem('vinix7_registered_users') || '[]');
+    registeredUsers.push(newUser);
+    localStorage.setItem('vinix7_registered_users', JSON.stringify(registeredUsers));
+    return { success: true, user: newUser };
   },
 
   // 3. Courses: Get All (with Progressive Gating Status)
@@ -341,14 +358,18 @@ export const apiClient = {
     if (attemptNumber === 2) setPaket = 'B';
     else if (attemptNumber >= 3) setPaket = 'C';
 
-    const courseQuestions = (MOCK_QUESTIONS[courseId] && MOCK_QUESTIONS[courseId][setPaket]) 
+    const rawQuestions = (MOCK_QUESTIONS[courseId] && MOCK_QUESTIONS[courseId][setPaket]) 
       || MOCK_QUESTIONS['c1']['A'];
+
+    const pgQuestions = rawQuestions.filter(q => q.tipe === 'pilihan_ganda').sort((a, b) => (a.urutan || 0) - (b.urutan || 0));
+    const essayQuestions = rawQuestions.filter(q => q.tipe === 'essay').sort((a, b) => (a.urutan || 0) - (b.urutan || 0));
+    const courseQuestions = [...pgQuestions, ...essayQuestions];
 
     const attemptId = 'att-' + Date.now();
 
-    const clientQuestions = courseQuestions.map(q => ({
+    const clientQuestions = courseQuestions.map((q, idx) => ({
       id: q.id,
-      urutan: q.urutan,
+      urutan: idx + 1,
       topik: q.topik,
       tipe: q.tipe,
       teks: q.teks,

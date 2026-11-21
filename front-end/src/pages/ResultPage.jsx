@@ -72,7 +72,15 @@ export default function ResultPage() {
     ? courses.find(c => c.urutan === currentCourse.urutan + 1)
     : null;
 
-  const evaluatedQuestions = attempt.evaluatedQuestions || [];
+  const rawEvaluatedQuestions = attempt.evaluatedQuestions || [];
+  const evaluatedQuestions = rawEvaluatedQuestions
+    .slice()
+    .sort((a, b) => {
+      if (a.tipe === 'pilihan_ganda' && b.tipe === 'essay') return -1;
+      if (a.tipe === 'essay' && b.tipe === 'pilihan_ganda') return 1;
+      return (a.urutan || 0) - (b.urutan || 0);
+    })
+    .map((q, idx) => ({ ...q, urutan: idx + 1 }));
 
   const filteredQuestions = evaluatedQuestions.filter(q => {
     if (filterMode === 'wrong') return q.poin < 10;

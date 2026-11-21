@@ -230,7 +230,7 @@ export const modul6Options = [
 ];
 
 // ─── ESSAY RUBRICS (15 Rubrik untuk Essay 1–15) ───────────────────────────────
-// ⚠️ WAJIB DIJAGA DI SERVER — TIDAK PERNAH DIKIRIM KE CLIENT
+// PENTING: WAJIB DIJAGA DI SERVER — TIDAK PERNAH DIKIRIM KE CLIENT
 export const modul6Rubrics = [
   // ════════════ SET A ESSAY RUBRICS (1–5) ════════════
   {

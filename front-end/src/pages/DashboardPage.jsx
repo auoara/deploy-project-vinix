@@ -37,14 +37,14 @@ export default function DashboardPage() {
           <div className="space-y-4 max-w-2xl">
             <div className="flex items-center gap-3">
               <div className="w-12 h-12 rounded-full bg-slate-200 text-[#0B132B] font-black text-sm flex items-center justify-center shrink-0 ring-2 ring-white/20 shadow-md">
-                {user?.nama ? user.nama.split(' ').map(n=>n[0]).slice(0,2).join('') : 'MF'}
+                {user?.nama ? user.nama.trim().split(' ').filter(Boolean).map(n => n[0]).slice(0, 2).join('').toUpperCase() : 'VX'}
               </div>
               <div>
                 <p className="text-xs text-blue-200 font-medium flex items-center gap-1.5">
-                  Selamat datang kembali 👋
+                  Selamat datang kembali
                 </p>
                 <h1 className="text-xl sm:text-2xl font-black text-white tracking-tight">
-                  {user?.nama || 'Muhammad Mirza Fatih'}
+                  {user?.nama || 'Peserta VINIX7'}
                 </h1>
               </div>
             </div>

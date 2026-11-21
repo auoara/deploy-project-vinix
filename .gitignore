@@ -37,3 +37,8 @@ Thumbs.db
 *.sqlite
 *.sqlite3
 pgdata/
+
+# Confidential Documents
+PRD*.pdf
+*.pdf
+!front-end/public/materials/*.pdf

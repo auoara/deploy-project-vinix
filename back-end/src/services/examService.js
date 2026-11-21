@@ -95,10 +95,15 @@ export async function startExam(userId, courseId) {
       throw err;
     }
 
-    let courseQuestions = [...rawQuestions];
+    let pgQuestions = rawQuestions.filter(q => q.tipe === 'pilihan_ganda');
+    let essayQuestions = rawQuestions.filter(q => q.tipe === 'essay');
+
     if (attemptNumber >= 4) {
-      courseQuestions = shuffleArray(courseQuestions);
+      pgQuestions = shuffleArray(pgQuestions);
+      essayQuestions = shuffleArray(essayQuestions);
     }
+
+    const courseQuestions = [...pgQuestions, ...essayQuestions];
 
     const pgIds = courseQuestions.filter(q => q.tipe === 'pilihan_ganda').map(q => q.id);
     let allOptions = [];
@@ -199,19 +204,26 @@ export async function startExam(userId, courseId) {
   const attemptNumber = userCourseAttempts.length + 1;
   const setPaket = determineSetPaket(attemptNumber);
 
-  let courseQuestions = questions
-    .filter(q => q.course_id === courseId && q.set_paket === setPaket)
+  let pgQuestions = questions
+    .filter(q => q.course_id === courseId && q.set_paket === setPaket && q.tipe === 'pilihan_ganda')
     .sort((a, b) => a.urutan - b.urutan);
 
-  if (courseQuestions.length === 0) {
+  let essayQuestions = questions
+    .filter(q => q.course_id === courseId && q.set_paket === setPaket && q.tipe === 'essay')
+    .sort((a, b) => a.urutan - b.urutan);
+
+  if (pgQuestions.length === 0 && essayQuestions.length === 0) {
     const err = new Error(`Bank soal Set ${setPaket} untuk modul ini belum tersedia.`);
     err.status = 503;
     throw err;
   }
 
   if (attemptNumber >= 4) {
-    courseQuestions = shuffleArray(courseQuestions);
+    pgQuestions = shuffleArray(pgQuestions);
+    essayQuestions = shuffleArray(essayQuestions);
   }
+
+  const courseQuestions = [...pgQuestions, ...essayQuestions];
 
   const attemptId = uuidv4();
   const newAttempt = {

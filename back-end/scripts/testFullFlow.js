@@ -37,21 +37,21 @@ const colors = {
 };
 
 function pass(step, msg) {
-  console.log(`${colors.green}✔ [PASS]${colors.reset} ${colors.bold}Langkah ${step}:${colors.reset} ${msg}`);
+  console.log(`${colors.green}[PASS]${colors.reset} ${colors.bold}Langkah ${step}:${colors.reset} ${msg}`);
 }
 
 function fail(step, msg, err) {
-  console.error(`${colors.red}✖ [FAIL] Langkah ${step}: ${msg}${colors.reset}`, err || '');
+  console.error(`${colors.red}[FAIL] Langkah ${step}: ${msg}${colors.reset}`, err || '');
   process.exit(1);
 }
 
 function info(msg) {
-  console.log(`${colors.cyan}ℹ [INFO]${colors.reset} ${msg}`);
+  console.log(`${colors.cyan}[INFO]${colors.reset} ${msg}`);
 }
 
 async function run() {
   console.log(`\n${colors.bold}${colors.blue}======================================================${colors.reset}`);
-  console.log(`${colors.bold}${colors.blue}🚀 MENJALANKAN PENGUJIAN OTOMATIS ALUR LENGKAP API VINIX7${colors.reset}`);
+  console.log(`${colors.bold}${colors.blue}MENJALANKAN PENGUJIAN OTOMATIS ALUR LENGKAP API VINIX7${colors.reset}`);
   console.log(`${colors.bold}${colors.blue}======================================================${colors.reset}\n`);
 
   // Start ephemeral server and wait until listening
@@ -339,7 +339,7 @@ async function run() {
     pass(7, `PROGRESSIVE GATING BERHASIL: Modul 1 = '${finalModul1.status}' (Nilai: ${finalModul1.nilaiTerbaik}), Modul 2 = '${finalModul2.status}' (Otomatis Terbuka!)`);
 
     console.log(`\n${colors.bold}${colors.green}================================================================${colors.reset}`);
-    console.log(`${colors.bold}${colors.green}🎉 SELURUH PENGUJIAN ALUR API VINIX7 BERHASIL DENGAN SEMPURNA!${colors.reset}`);
+    console.log(`${colors.bold}${colors.green}PENGUJIAN ALUR LENGKAP API VINIX7 BERHASIL DENGAN LENGKAP!${colors.reset}`);
     console.log(`${colors.bold}${colors.green}================================================================\n`);
 
   } catch (err) {

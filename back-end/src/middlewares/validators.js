@@ -18,10 +18,11 @@ export function validateRegister(req, res, next) {
 }
 
 export function validateLogin(req, res, next) {
-  const { email, password } = req.body;
+  const { email, identifier, password } = req.body;
+  const loginKey = (email || identifier || '').trim();
   const errors = [];
 
-  if (!email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) errors.push('Format email tidak valid.');
+  if (!loginKey || loginKey.length < 2) errors.push('Email atau nama pengguna wajib diisi.');
   if (!password) errors.push('Password wajib diisi.');
 
   if (errors.length > 0) {

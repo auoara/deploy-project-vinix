@@ -41,7 +41,19 @@ export default function ExamPage() {
           return;
         }
 
-        setAttemptData(res);
+        const sortedQuestions = (res.questions || [])
+          .slice()
+          .sort((a, b) => {
+            if (a.tipe === 'pilihan_ganda' && b.tipe === 'essay') return -1;
+            if (a.tipe === 'essay' && b.tipe === 'pilihan_ganda') return 1;
+            return (a.urutan || 0) - (b.urutan || 0);
+          })
+          .map((q, idx) => ({ ...q, urutan: idx + 1 }));
+
+        setAttemptData({
+          ...res,
+          questions: sortedQuestions
+        });
 
         // Check if there is saved draft in localStorage
         const draftKey = `vinix7_exam_draft_${res.attemptId}`;

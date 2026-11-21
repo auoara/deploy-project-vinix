@@ -9,7 +9,7 @@ import {
 let errors = 0;
 
 function logError(msg) {
-  console.error(`✖ [ERROR] ${msg}`);
+  console.error(`[ERROR] ${msg}`);
   errors++;
 }
 
@@ -90,8 +90,8 @@ for (const q of questions) {
 
 console.log('======================================================');
 if (errors === 0) {
-  console.log('✔ AUDIT SELESAI: 0 ERROR! Seluruh 450 soal siap dimigrasi ke Supabase.');
+  console.log('[OK] AUDIT SELESAI: 0 ERROR! Seluruh 450 soal siap dimigrasi ke Supabase.');
 } else {
-  console.log(`✖ AUDIT SELESAI: Ditemukan ${errors} error yang perlu diperbaiki.`);
+  console.log(`[FAIL] AUDIT SELESAI: Ditemukan ${errors} error yang perlu diperbaiki.`);
   process.exit(1);
 }

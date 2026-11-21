@@ -114,9 +114,9 @@ const isDirectRun = process.argv[1] && path.resolve(process.argv[1]) === path.re
 if (isDirectRun && process.env.NODE_ENV !== 'test') {
   app.listen(PORT, () => {
     console.log(`\n======================================================`);
-    console.log(`🚀 VINIX7 Back-End Server running on http://localhost:${PORT}`);
-    console.log(`📦 Data Store Mode   : ${process.env.DATA_STORE || 'memory'}`);
-    console.log(`🌐 Allowed Frontend  : ${process.env.FRONTEND_URL || 'http://localhost:5173'}`);
+    console.log(`VINIX7 Back-End Server running on http://localhost:${PORT}`);
+    console.log(`Data Store Mode   : ${process.env.DATA_STORE || 'memory'}`);
+    console.log(`Allowed Frontend  : ${process.env.FRONTEND_URL || 'http://localhost:5173'}`);
     console.log(`======================================================\n`);
   });
 }

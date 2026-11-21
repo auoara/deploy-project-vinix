@@ -58,7 +58,7 @@ async function seed() {
         .select('*', { count: 'exact', head: true });
 
       if (error) throw error;
-      console.log(`✔ Tabel ${table.padEnd(15)} : ${count} baris`);
+      console.log(`[OK] Tabel ${table.padEnd(15)} : ${count} baris`);
     }
 
     const { count: correctCount, error: correctErr } = await supabase
@@ -67,7 +67,7 @@ async function seed() {
       .eq('is_correct', true);
 
     if (correctErr) throw correctErr;
-    console.log(`✔ Opsi jawaban benar     : ${correctCount} baris (Target: 300)`);
+    console.log(`[OK] Opsi jawaban benar     : ${correctCount} baris (Target: 300)`);
 
     if (correctCount !== 300) {
       throw new Error(
@@ -75,9 +75,9 @@ async function seed() {
       );
     }
 
-    console.log('\n🎉 MIGRASI DATA KE SUPABASE SELESAI DENGAN SEMPURNA!');
+    console.log('\nMIGRASI DATA KE SUPABASE SELESAI DENGAN SUKSES!');
   } catch (err) {
-    console.error('\n✖ [MIGRASI GAGAL]', err.message);
+    console.error('\n[MIGRASI GAGAL]', err.message);
     process.exit(1);
   }
 }
